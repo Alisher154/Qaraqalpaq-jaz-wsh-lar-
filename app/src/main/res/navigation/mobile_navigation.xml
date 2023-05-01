@@ -14,7 +14,7 @@
 
     <fragment
         android:id="@+id/nav_chosen"
-        android:name="uz.texnopos.jaziwshilar.favorite.FragmentFavorite"
+        android:name="uz.texnopos.jaziwshilar.favorite.FavoriteFragment"
         android:label="@string/menu_chosen"
         tools:layout="@layout/fragment_chosen" />
 

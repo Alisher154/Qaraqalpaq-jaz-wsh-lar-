@@ -1,19 +1,19 @@
 package uz.texnopos.jaziwshilar.poets
 
-import uz.texnopos.jaziwshilar.data.Poets
+import uz.texnopos.jaziwshilar.data.Poet
 import uz.texnopos.jaziwshilar.data.PoetsDao
 import java.util.*
 import kotlin.collections.ArrayList
 
 class PoetPresenter(private var dao: PoetsDao, var view: PoetView) {
-    private lateinit var poetList: List<Poets>
+    private lateinit var poetList: List<Poet>
     fun getAllPoets() {
         poetList = dao.getAllPoetsAndId()
         view.setData(poetList)
     }
 
     fun filter(text: String) {
-        val filteredNames = ArrayList<Poets>()
+        val filteredNames = ArrayList<Poet>()
         poetList.filterTo(filteredNames) {
             it.poetName!!.toLowerCase(Locale.ROOT).contains(text.toKiril().toLowerCase(Locale.ROOT))
         }

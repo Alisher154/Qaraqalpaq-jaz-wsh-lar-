@@ -3,7 +3,7 @@ package uz.texnopos.jaziwshilar.data
 import androidx.room.*
 
 @Entity(tableName = "jaziwshilar")
-data class Poets(
+data class Poet(
     @PrimaryKey val id: Int,
     @ColumnInfo(name = "poetName")
     val poetName: String?,

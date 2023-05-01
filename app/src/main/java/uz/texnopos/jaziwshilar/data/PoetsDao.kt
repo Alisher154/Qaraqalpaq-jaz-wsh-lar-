@@ -24,8 +24,8 @@ interface PoetsDao {
     fun setDate(id: Int, currentTime: Long)
 
     @Query("SELECT id,poetName FROM jaziwshilar WHERE isFavorite=1 ORDER by date DESC")
-    fun getAllFavorites(): List<Poets>
+    suspend fun getAllFavorites(): List<Poet>
 
     @Query("SELECT id , poetName from jaziwshilar")
-    fun getAllPoetsAndId(): List<Poets>
+    fun getAllPoetsAndId(): List<Poet>
 }
