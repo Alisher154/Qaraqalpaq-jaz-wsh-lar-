@@ -4,14 +4,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import uz.texnopos.jaziwshilar.data.Poet
+import uz.texnopos.jaziwshilar.data.PoetEntity
 import kotlinx.android.synthetic.main.item_poet.view.*
 import uz.texnopos.jaziwshilar.R
 
 class PoetAdapter : RecyclerView.Adapter<PoetAdapter.PoetListViewHolder>() {
     inner class PoetListViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-        fun populateModel(model: Poet) {
+        fun populateModel(model: PoetEntity) {
             itemView.poetName.text = model.poetName
             itemView.setOnClickListener {
                 onCLick.invoke(model.id)
@@ -19,7 +19,7 @@ class PoetAdapter : RecyclerView.Adapter<PoetAdapter.PoetListViewHolder>() {
         }
     }
 
-    var models = listOf<Poet>()
+    var models = listOf<PoetEntity>()
         set(value) {
             field = value
             notifyDataSetChanged()

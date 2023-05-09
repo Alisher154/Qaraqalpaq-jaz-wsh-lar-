@@ -6,32 +6,51 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.get
 import kotlinx.android.synthetic.main.fragment_poets_list.*
 import uz.texnopos.jaziwshilar.R
 import uz.texnopos.jaziwshilar.biography.BioActivity
-import uz.texnopos.jaziwshilar.data.Poet
+import uz.texnopos.jaziwshilar.data.PoetEntity
 import uz.texnopos.jaziwshilar.data.PoetsDao
 import uz.texnopos.jaziwshilar.data.PoetsDatabase
+import uz.texnopos.jaziwshilar.favorite.FavoriteViewModel
 
-class FragmentPoets : Fragment(R.layout.fragment_poets_list), PoetView {
+class PoetsFragment : Fragment(R.layout.fragment_poets_list) {
     companion object {
         const val ID = "id"
     }
+
     lateinit var menuItem: MenuItem
-    private lateinit var dao: PoetsDao
+
+    //    private lateinit var dao: PoetsDao
     private val adapter = PoetAdapter()
-    lateinit var presenter: PoetPresenter
+    private lateinit var viewModel: PoetsViewModel
+
+    //    lateinit var presenter: PoetPresenter
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
     }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        dao = PoetsDatabase.getInstance(requireContext()).dao()
-        presenter = PoetPresenter(dao, this)
-        presenter.getAllPoets()
+        val dao = PoetsDatabase.getInstance(requireContext().applicationContext).dao()
+        val repository = PoetRepository(dao)
+        val factory = PoetsViewModel.Factory(repository)
+        viewModel = ViewModelProvider(this, factory).get()
+//        dao = PoetsDatabase.getInstance(requireContext()).dao()
+//        presenter = PoetPresenter(dao, this)
+//        presenter.getAllPoets()
         recyclerView.adapter = adapter
+
+        viewModel.getPoets()
+        viewModel.poets.observe(viewLifecycleOwner) {
+            adapter.models = it
+        }
+
 
         val intent = Intent(requireContext(), BioActivity::class.java)
         adapter.setOnItemClickListener { id ->
@@ -40,29 +59,31 @@ class FragmentPoets : Fragment(R.layout.fragment_poets_list), PoetView {
         }
     }
 
-    override fun setData(models: List<Poet>) {
-        adapter.models = models
-    }
-
-    override fun filteredNames(list: List<Poet>) {
-        adapter.models = list
-    }
+//    override fun setData(models: List<PoetEntity>) {
+//        adapter.models = models
+//    }
+//
+//    override fun filteredNames(list: List<PoetEntity>) {
+//        adapter.models = list
+//    }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.menu_search,menu)
+        inflater.inflate(R.menu.menu_search, menu)
         menuItem = menu.findItem(R.id.action_search)
-        val viewSearch = menuItem.actionView as androidx.appcompat.widget.SearchView
+        val viewSearch = menuItem.actionView as SearchView
         viewSearch.queryHint = getString(R.string.search)
         viewSearch.setOnQueryTextListener(object :
-            androidx.appcompat.widget.SearchView.OnQueryTextListener {
+            SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 viewSearch.clearFocus()
-                presenter.filter(query!!)
+//                presenter.filter(query!!)
+                query?.let { viewModel.getPoetsByName(it) }
                 return false
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                presenter.filter(newText!!)
+//                presenter.filter(newText!!)
+                newText?.let { viewModel.getPoetsByName(it) }
                 return false
             }
         })

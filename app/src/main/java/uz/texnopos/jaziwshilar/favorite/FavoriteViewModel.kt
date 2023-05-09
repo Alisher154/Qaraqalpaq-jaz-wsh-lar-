@@ -2,12 +2,12 @@ package uz.texnopos.jaziwshilar.favorite
 
 import androidx.lifecycle.*
 import kotlinx.coroutines.launch
-import uz.texnopos.jaziwshilar.data.Poet
+import uz.texnopos.jaziwshilar.data.PoetEntity
 
 class FavoriteViewModel(private val repository: FavoriteRepository) : ViewModel() {
-    private val _favorites = MutableLiveData<List<Poet>>()
+    private val _favorites = MutableLiveData<List<PoetEntity>>()
 
-    val favorites: LiveData<List<Poet>> get() = _favorites
+    val favorites: LiveData<List<PoetEntity>> get() = _favorites
 
 
     fun getAllFavorites() {

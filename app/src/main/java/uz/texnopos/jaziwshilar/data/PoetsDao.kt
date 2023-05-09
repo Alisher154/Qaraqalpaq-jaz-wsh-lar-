@@ -24,8 +24,14 @@ interface PoetsDao {
     fun setDate(id: Int, currentTime: Long)
 
     @Query("SELECT id,poetName FROM jaziwshilar WHERE isFavorite=1 ORDER by date DESC")
-    suspend fun getAllFavorites(): List<Poet>
+    suspend fun getFavorites(): List<PoetEntity>
 
     @Query("SELECT id , poetName from jaziwshilar")
-    fun getAllPoetsAndId(): List<Poet>
+    fun getPoetsAndId(): List<PoetEntity>
+
+    @Query("SELECT * FROM  jaziwshilar")
+    suspend fun getPoets():List<PoetEntity>
+
+    @Query("SELECT * FROM jaziwshilar WHERE poetName LIKE '%' || :query || '%'")
+    suspend fun getPoetsByName(query: String):List<PoetEntity>
 }

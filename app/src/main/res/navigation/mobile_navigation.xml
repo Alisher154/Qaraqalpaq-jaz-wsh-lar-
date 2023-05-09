@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/nav_poets"
-        android:name="uz.texnopos.jaziwshilar.poets.FragmentPoets"
+        android:name="uz.texnopos.jaziwshilar.poets.PoetsFragment"
         android:label="@string/menu_poets"
         tools:layout="@layout/fragment_poets_list"
         />
@@ -20,7 +20,7 @@
 
     <fragment
         android:id="@+id/nav_info"
-        android:name="uz.texnopos.jaziwshilar.info.FragmentInfo"
+        android:name="uz.texnopos.jaziwshilar.info.InfoFragment"
         android:label="@string/menu_info"
         tools:layout="@layout/fragment_info" >
 
