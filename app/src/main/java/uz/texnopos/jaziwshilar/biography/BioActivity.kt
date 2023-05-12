@@ -8,43 +8,57 @@ import android.view.MenuItem
 import android.view.animation.AnimationUtils
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.text.HtmlCompat
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.get
 import uz.texnopos.jaziwshilar.data.PoetsDatabase
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.avtivity_bio.*
 import uz.texnopos.jaziwshilar.R
 
-class BioActivity : AppCompatActivity(), BiographyView {
+class BioActivity : AppCompatActivity() {
     private var favoriteItem: MenuItem? = null
-    private lateinit var presenter: BiographyPresenter
-    private val dao = PoetsDatabase.getInstance(this).dao()
+    private lateinit var viewModel: BiographyViewModel
     private var toast = false
+    private var id = 1
+    private var isFavorite = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.avtivity_bio)
+        id = intent.getIntExtra("id", 1)
+        val dao = PoetsDatabase.getInstance(applicationContext).dao()
+        val repository = BiographyRepository(dao)
+        val factory = BiographyViewModel.Factory(repository)
+        viewModel = ViewModelProvider(this, factory).get()
 
-        val fromLeft = AnimationUtils.loadAnimation(this, R.anim.from_left)
-        fromLeft.startOffset = 300
-        tvPoetName.startAnimation(fromLeft)
-        val fadeFromIn = AnimationUtils.loadAnimation(this, R.anim.fade_from_in)
-        fadeFromIn.startOffset = 800
-        tvPoetLife.startAnimation(fadeFromIn)
-        val fromBottom = AnimationUtils.loadAnimation(this, R.anim.from_bottom)
-        fromBottom.startOffset = 1000
-        tvBio.startAnimation(fromBottom)
+        viewModel.getPoetById(id)
+        viewModel.biography.observe(this) {
+            tvPoetName.text = it.poetName
+            tvPoetLife.text = it.lifeSpan
+            tvBio.text = HtmlCompat.fromHtml(it.biography ?: "", HtmlCompat.FROM_HTML_MODE_COMPACT)
+            isFavorite = it.isFavorite == 1
+            val fromLeft = AnimationUtils.loadAnimation(this, R.anim.from_left)
+            fromLeft.startOffset = 300
+            tvPoetName.startAnimation(fromLeft)
+            val fadeFromIn = AnimationUtils.loadAnimation(this, R.anim.fade_from_in)
+            fadeFromIn.startOffset = 800
+            tvPoetLife.startAnimation(fadeFromIn)
+            val fromBottom = AnimationUtils.loadAnimation(this, R.anim.from_bottom)
+            fromBottom.startOffset = 1000
+            tvBio.startAnimation(fromBottom)
+        }
 
-        val id = intent.getIntExtra("id", 1)
-        presenter = BiographyPresenter(dao, this, id)
-        presenter.getBiography()
+
+
         setSupportActionBar(toolbar_bio)
 
-        supportActionBar!!.setHomeAsUpIndicator(R.drawable.ic_baseline_arrow_back_24)
-        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_baseline_arrow_back_24)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.biography_toolbar, menu)
-        favoriteItem = menu!!.findItem(R.id.favorite)
-        presenter.setBookmark()
+        favoriteItem = menu?.findItem(R.id.favorite)
+        changeBookmark(isFavorite)
         return true
     }
 
@@ -54,7 +68,8 @@ class BioActivity : AppCompatActivity(), BiographyView {
                 finish()
             }
             R.id.favorite -> {
-                presenter.changeBookmark()
+                viewModel.setPoetStatus(id)
+                changeBookmark(viewModel.isFavorite)
             }
             R.id.share -> {
                 val sharingIntent = Intent(Intent.ACTION_SEND)
@@ -68,25 +83,22 @@ class BioActivity : AppCompatActivity(), BiographyView {
         return true
     }
 
-    override fun getBiography(biography: String, poetName: String, lifeSpan: String) {
-        tvPoetName.text = poetName
-        tvPoetLife.text = lifeSpan
-        tvBio.text = HtmlCompat.fromHtml(biography, HtmlCompat.FROM_HTML_MODE_COMPACT)
-    }
 
-    override fun changeBookmark(isPressed: Boolean) {
+
+
+    private fun changeBookmark(isPressed: Boolean) {
         if (isPressed) {
             if (toast) Snackbar.make(ln, "Сайландыларға қосылды", Snackbar.LENGTH_SHORT)
                 .setBackgroundTint(Color.BLACK)
                 .setTextColor(Color.WHITE)
                 .show()
-            favoriteItem!!.setIcon(R.drawable.ic_baseline_bookmark_24)
+            favoriteItem?.setIcon(R.drawable.ic_baseline_bookmark_24)
         } else {
             if (toast) Snackbar.make(ln, "Сайландылардан өширилди", Snackbar.LENGTH_SHORT)
                 .setBackgroundTint(Color.BLACK)
                 .setTextColor(Color.WHITE)
                 .show()
-            favoriteItem!!.setIcon(R.drawable.ic_baseline_bookmark_border_24)
+            favoriteItem?.setIcon(R.drawable.ic_baseline_bookmark_border_24)
         }
         toast = true
     }

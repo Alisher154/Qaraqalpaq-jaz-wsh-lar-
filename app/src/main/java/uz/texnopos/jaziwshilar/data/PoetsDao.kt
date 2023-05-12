@@ -30,8 +30,14 @@ interface PoetsDao {
     fun getPoetsAndId(): List<PoetEntity>
 
     @Query("SELECT * FROM  jaziwshilar")
-    suspend fun getPoets():List<PoetEntity>
+    suspend fun getPoets(): List<PoetEntity>
 
     @Query("SELECT * FROM jaziwshilar WHERE poetName LIKE '%' || :query || '%'")
-    suspend fun getPoetsByName(query: String):List<PoetEntity>
+    suspend fun getPoetsByName(query: String): List<PoetEntity>
+
+    @Query("SELECT * FROM jaziwshilar WHERE id =:id")
+    suspend fun getPoetById(id: Int): PoetEntity
+
+    @Query("UPDATE jaziwshilar SET isFavorite=:isFavorite, date=:currentTime WHERE id=:id")
+    suspend fun setStatusAndDate(id:Int, isFavorite: Int, currentTime: Long)
 }
